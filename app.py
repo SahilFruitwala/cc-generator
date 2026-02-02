@@ -79,11 +79,44 @@ def format_timestamp(seconds):
 def write_srt(segments, output_path):
     """Writes transcription segments to an SRT file."""
     with open(output_path, "w", encoding="utf-8") as f:
-        for i, segment in enumerate(segments, start=1):
-            start = format_timestamp(segment["start"])
-            end = format_timestamp(segment["end"])
-            text = segment["text"].strip()
-            f.write(f"{i}\n{start} --> {end}\n{text}\n\n")
+        caption_counter = 1
+        for segment in segments:
+            # Check if word timestamps are available
+            if "words" in segment:
+                words = segment["words"]
+                current_chunk = []
+                MAX_WORDS_PER_CHUNK = 4  # Adjust this for more/less granularity
+                
+                for word_info in words:
+                    current_chunk.append(word_info)
+                    
+                    if len(current_chunk) >= MAX_WORDS_PER_CHUNK:
+                        start_time = current_chunk[0]["start"]
+                        end_time = current_chunk[-1]["end"]
+                        text = "".join([w["word"] for w in current_chunk]).strip()
+                        
+                        f.write(f"{caption_counter}\n")
+                        f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
+                        f.write(f"{text}\n\n")
+                        caption_counter += 1
+                        current_chunk = []
+                
+                # Flush remaining words in buffer
+                if current_chunk:
+                    start_time = current_chunk[0]["start"]
+                    end_time = current_chunk[-1]["end"]
+                    text = "".join([w["word"] for w in current_chunk]).strip()
+                    
+                    f.write(f"{caption_counter}\n")
+                    f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
+                    f.write(f"{text}\n\n")
+                    caption_counter += 1
+            else:
+                s_start = format_timestamp(segment["start"])
+                s_end = format_timestamp(segment["end"])
+                text = segment["text"].strip()
+                f.write(f"{caption_counter}\n{s_start} --> {s_end}\n{text}\n\n")
+                caption_counter += 1
 
 def add_log(task_id: str, message: str):
     timestamp = time.strftime("%H:%M:%S")
@@ -133,8 +166,12 @@ def run_transcription_task(file_path: str, model_id: str, task_id: str):
         transcription_progress[task_id] = 30
         
         add_log(task_id, "Model loaded. Starting inference on Apple Silicon GPU...")
-        # Point mlx_whisper to the local model folder
-        result = mlx_whisper.transcribe(file_path, path_or_hf_repo=str(local_model_path))
+        # Point mlx_whisper to the local model folder, enable word timestamps for granular sync
+        result = mlx_whisper.transcribe(
+            file_path, 
+            path_or_hf_repo=str(local_model_path),
+            word_timestamps=True
+        )
         transcription_progress[task_id] = 80
         
         add_log(task_id, "Inference complete. Formatting SRT file...")
