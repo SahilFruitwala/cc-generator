@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Caption Generator | Apple M2 Optimized</title>
+    <link rel="stylesheet" href="/static/style.css?v=1.2">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container" id="app-container">
+        <header>
+            <h1>AI Caption Generator</h1>
+            <p class="subtitle">Optimized for MacBook Air M2</p>
+        </header>
+
+        <main>
+            <section class="upload-section" id="drop-zone">
+                <div class="upload-icon">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                </div>
+                <h3>Choose a file or drag & drop</h3>
+                <p>Supports .mp4, .mov, .mkv, .mp3, .wav</p>
+                <input type="file" id="file-input" hidden>
+                <button class="btn btn-secondary" id="browse-btn" onclick="document.getElementById('file-input').click()">Browse Files</button>
+                <div id="selected-file-name" class="file-name"></div>
+            </section>
+
+            <section class="config-section">
+                <div class="section-header">
+                    <h3>Model Management</h3>
+                    <p class="section-desc">Choose a model based on your Mac's RAM and performance needs.</p>
+                </div>
+                
+                <div class="model-table-container">
+                    <table class="model-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>RAM Req.</th>
+                                <th>Speed</th>
+                                <th>Accuracy</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="model-list-body">
+                            <!-- Models will be dynamically loaded here -->
+                            <tr>
+                                <td colspan="6" class="table-loading">Loading models...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action-footer">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="auto-download-check" checked>
+                        <span class="checkmark"></span>
+                        Auto-download missing models
+                    </label>
+                    <input type="hidden" id="model-select" value="mlx-community/whisper-large-v3-turbo">
+                    <button id="generate-btn" class="btn btn-primary btn-large">
+                        <span>Generate Captions</span>
+                        <div class="loader" id="btn-loader" hidden></div>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <footer>
+            <p>Built with mlx-whisper & FastAPI</p>
+        </footer>
+    </div>
+
+    <!-- Progress Modal -->
+    <div id="progress-modal-overlay" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="progress-title">Processing...</h3>
+                <!-- No close button during processing -->
+            </div>
+            <div class="modal-body">
+                <div class="progress-info">
+                    <span id="progress-status">Initializing...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="status-terminal" id="terminal"></div>
+                
+                <div id="caption-preview-container" class="caption-preview-container" hidden>
+                    <h5>Caption Preview</h5>
+                    <div id="caption-preview" class="caption-preview"></div>
+                </div>
+            </div>
+            <div class="modal-footer" id="progress-footer">
+                <button id="cancel-btn" class="btn btn-danger" hidden>Cancel</button>
+                <div id="download-area" hidden>
+                    <a id="download-link" href="#" class="btn btn-success" download>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download SRT
+                    </a>
+                </div>
+                <button id="progress-close-btn" class="btn btn-primary" hidden>Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Notification Modal -->
+    <div id="modal-overlay" class="modal-overlay" hidden>
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Notification</h3>
+                <button id="modal-close" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-message">
+                Message goes here.
+            </div>
+            <div class="modal-footer">
+                <button id="modal-btn" class="btn btn-primary">Okay</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js?v=1.6"></script>
+</body>
+</html>
