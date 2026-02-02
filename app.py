@@ -77,46 +77,76 @@ def format_timestamp(seconds):
     return f"{hours:02d}:{minutes:02d}:{secs:02d},{millis:03d}"
 
 def write_srt(segments, output_path):
-    """Writes transcription segments to an SRT file."""
+    """Writes transcription segments to an SRT file using smart chunking."""
+    
+    # Constants for smart chunking
+    MAX_CHARS = 42
+    MAX_WORDS = 8
+    PAUSE_THRESHOLD = 0.5  # seconds
+
+    # Flatten all words from all segments into a single stream for continuous processing
+    all_words = []
+    for segment in segments:
+        if "words" in segment:
+            all_words.extend(segment["words"])
+    
     with open(output_path, "w", encoding="utf-8") as f:
         caption_counter = 1
-        for segment in segments:
-            # Check if word timestamps are available
-            if "words" in segment:
-                words = segment["words"]
-                current_chunk = []
-                MAX_WORDS_PER_CHUNK = 4  # Adjust this for more/less granularity
-                
-                for word_info in words:
-                    current_chunk.append(word_info)
-                    
-                    if len(current_chunk) >= MAX_WORDS_PER_CHUNK:
-                        start_time = current_chunk[0]["start"]
-                        end_time = current_chunk[-1]["end"]
-                        text = "".join([w["word"] for w in current_chunk]).strip()
-                        
-                        f.write(f"{caption_counter}\n")
-                        f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
-                        f.write(f"{text}\n\n")
-                        caption_counter += 1
-                        current_chunk = []
-                
-                # Flush remaining words in buffer
-                if current_chunk:
-                    start_time = current_chunk[0]["start"]
-                    end_time = current_chunk[-1]["end"]
-                    text = "".join([w["word"] for w in current_chunk]).strip()
-                    
-                    f.write(f"{caption_counter}\n")
-                    f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
-                    f.write(f"{text}\n\n")
-                    caption_counter += 1
-            else:
-                s_start = format_timestamp(segment["start"])
-                s_end = format_timestamp(segment["end"])
+        
+        # Fallback to segment-based if no word timestamps found
+        if not all_words:
+            for i, segment in enumerate(segments, start=1):
+                start = format_timestamp(segment["start"])
+                end = format_timestamp(segment["end"])
                 text = segment["text"].strip()
-                f.write(f"{caption_counter}\n{s_start} --> {s_end}\n{text}\n\n")
+                f.write(f"{i}\n{start} --> {end}\n{text}\n\n")
+            return
+
+        current_chunk = []
+        
+        for i, word_info in enumerate(all_words):
+            current_chunk.append(word_info)
+            should_break = False
+            
+            # 1. Check for natural pause (look ahead to next word)
+            if i < len(all_words) - 1:
+                next_word = all_words[i+1]
+                if next_word["start"] - word_info["end"] > PAUSE_THRESHOLD:
+                    should_break = True
+            
+            # 2. Check for punctuation
+            word_text = word_info["word"].strip()
+            if word_text and word_text[-1] in ".?!":
+                should_break = True
+                
+            # 3. Check for max length (character count)
+            current_text = "".join([w["word"] for w in current_chunk]).strip()
+            if len(current_text) > MAX_CHARS:
+                should_break = True
+                
+            # 4. Check for max words
+            if len(current_chunk) >= MAX_WORDS:
+                should_break = True
+            
+            if should_break and current_chunk:
+                start_time = current_chunk[0]["start"]
+                end_time = current_chunk[-1]["end"]
+                text = "".join([w["word"] for w in current_chunk]).strip()
+                
+                f.write(f"{caption_counter}\n")
+                f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
+                f.write(f"{text}\n\n")
                 caption_counter += 1
+                current_chunk = []
+        
+        # Flush remaining words in buffer
+        if current_chunk:
+            start_time = current_chunk[0]["start"]
+            end_time = current_chunk[-1]["end"]
+            text = "".join([w["word"] for w in current_chunk]).strip()
+            f.write(f"{caption_counter}\n")
+            f.write(f"{format_timestamp(start_time)} --> {format_timestamp(end_time)}\n")
+            f.write(f"{text}\n\n")
 
 def add_log(task_id: str, message: str):
     timestamp = time.strftime("%H:%M:%S")
