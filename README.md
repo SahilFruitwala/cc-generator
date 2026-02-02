@@ -1,44 +1,67 @@
-# CC Generator
+# AI Caption Generator (Apple Silicon Edition)
 
-A web-based tool to generate .srt captions for video files using Whisper.
+A high-performance tool that automatically creates subtitles for your videos. Optimized specifically for Mac computers with Apple Silicon chips (M1, M2, M3).
 
-## Features
-- Upload video/audio files
-- Automatic transcription using Whisper
-- Download generated .srt files
-- Local processing (privacy-focused)
+## 🌟 What does this do?
+*   **Drag & Drop** any video or audio file.
+*   **Automatic AI Transcription:** Generates captions in seconds.
+*   **Privacy First:** Everything runs **100% offline** on your Mac. No data is ever sent to the cloud.
+*   **Space Saving:** Automatically cleans up large video files after processing.
 
-## Setup
+---
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd cc-generator
-   ```
+## 🚀 How to Install (One-Time Setup)
 
-2. **Create a virtual environment**
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+Since this app runs locally on your Mac, you'll need to set it up once.
 
-3. **Install dependencies**
-   (Note: Add a requirements.txt if not already present)
-   ```bash
-   pip install flask transformers torch torchaudio
-   ```
+1.  **Open Terminal** (Command+Space, type "Terminal").
 
-4. **Download Models**
-   ```bash
-   python3 download_models.py
-   ```
+2.  **Download the Code**:
+    ```bash
+    git clone <your-repo-url>
+    cd cc-generator
+    ```
 
-5. **Run the application**
-   ```bash
-   python3 app.py
-   ```
+3.  **Create a Virtual Environment** (Keeps things clean!):
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
 
-## Technologies
-- **Backend**: Python (Flask)
-- **Frontend**: Vanilla HTML/CSS/JS
-- **Transcription**: Whisper (HuggingFace Transformers)
+4.  **Install Dependencies**:
+    ```bash
+    python3 -m pip install -r requirements.txt
+    ```
+    *Wait for it to finish installing the AI tools (MLX Whisper, etc.).*
+
+---
+
+## ▶️ How to Use
+
+1.  **Start the App**:
+    In your terminal, run:
+    ```bash
+    python3 app.py
+    ```
+    *You should see a message saying:* `Server running at http://0.0.0.0:8000`
+
+2.  **Open in Browser**:
+    Open Chrome or Safari and go to:
+    **[http://localhost:8000](http://localhost:8000)**
+
+3.  **Generate Captions**:
+    *   **Drag & Drop** your video or audio file into the box.
+    *   (Optional) Select a model from the list. "Large v3 Turbo" is recommended for best accuracy.
+    *   Click **"Generate Captions"**.
+
+4.  **Download**:
+    *   Watch the progress bar (it stays in a modal so you can't miss it!).
+    *   Once finished, click the **"Download SRT"** button.
+    *   *Your original video file is automatically deleted to save space.*
+
+---
+
+## 💡 Tips
+*   **First Run might be slow:** The first time you pick a new model, it needs to download (1-3 GB). Future runs will be instant!
+*   **"Auto-Download":** Keep this checked to let the app handle model downloads for you.
+*   **Deleting Models:** If you need disk space, you can delete old models directly from the list by hovering over them and clicking "Delete".
