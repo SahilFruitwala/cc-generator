@@ -7,6 +7,7 @@
     --text-secondary: #94a3b8;
     --border: rgba(255, 255, 255, 0.08);
     --accent: #8b5cf6;
+    --yellow: #facc15;
 }
 
 * {
@@ -182,9 +183,9 @@ section {
 .selection-dot {
     width: 8px;
     height: 8px;
-    background: var(--primary);
+    background: var(--yellow);
     border-radius: 50%;
-    box-shadow: 0 0 10px var(--primary);
+    box-shadow: 0 0 10px var(--yellow);
     animation: pulse 2s infinite;
 }
 

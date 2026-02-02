@@ -145,11 +145,17 @@ def run_transcription_task(file_path: str, model_id: str, task_id: str):
         transcription_results[task_id] = result["segments"]
         
         # Auto-cleanup: Delete the original uploaded file
+        time.sleep(1) # Wait for file handles to release
         try:
+            print(f"DEBUG: Attempting to delete {file_path}")
             if os.path.exists(file_path):
                 os.remove(file_path)
+                print(f"DEBUG: Successfully deleted {file_path}")
                 add_log(task_id, f"Cleaned up source file: {os.path.basename(file_path)}")
+            else:
+                print(f"DEBUG: File not found for deletion: {file_path}")
         except Exception as cleanup_error:
+            print(f"DEBUG: Deletion error: {cleanup_error}")
             add_log(task_id, f"WARNING: Failed to delete source file: {str(cleanup_error)}")
 
         add_log(task_id, "Done!")
