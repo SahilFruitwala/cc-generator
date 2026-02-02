@@ -2,6 +2,8 @@
 
 A high-performance tool that automatically creates subtitles for your videos. Optimized specifically for Mac computers with Apple Silicon chips (M1, M2, M3).
 
+> **⚠️ Note:** This application is currently **tested on macOS only**. It leverage Apple Silicon's GPU/Neural Engine via the `mlx` framework.
+
 ## 🌟 What does this do?
 *   **Drag & Drop** any video or audio file.
 *   **Automatic AI Transcription:** Generates captions in seconds.
@@ -18,7 +20,7 @@ Since this app runs locally on your Mac, you'll need to set it up once.
 
 2.  **Download the Code**:
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/SahilFruitwala/cc-generator.git
     cd cc-generator
     ```
 
