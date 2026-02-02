@@ -72,7 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
             <tr class="model-row ${m.key === selectedModelKey ? 'selected' : ''}" data-key="${m.key}" data-id="${m.id}">
                 <td>
                     <div class="model-name-cell">
-                        <strong>${m.name}</strong>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="selection-dot ${m.key === selectedModelKey ? '' : 'inactive'}"></div>
+                            <strong>${m.name}</strong>
+                        </div>
                         <span class="model-id-sub">${m.id}</span>
                     </div>
                 </td>
@@ -116,8 +119,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function selectModel(row) {
-        document.querySelectorAll('.model-row').forEach(r => r.classList.remove('selected'));
+        document.querySelectorAll('.model-row').forEach(r => {
+            r.classList.remove('selected');
+            r.querySelector('.selection-dot').classList.add('inactive');
+        });
         row.classList.add('selected');
+        row.querySelector('.selection-dot').classList.remove('inactive');
         selectedModelKey = row.dataset.key;
         modelSelect.value = row.dataset.id;
     }
@@ -304,6 +311,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners & UI Helpers ---
 
     fileInput.addEventListener('change', (e) => handleFileSelect(e.target.files[0]));
+
+    dropZone.addEventListener('click', (e) => {
+        if (appContainer.classList.contains('processing')) return;
+        // Only trigger if we didn't click the button itself (to avoid double trigger)
+        if (e.target.id !== 'browse-btn') {
+            fileInput.click();
+        }
+    });
 
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
