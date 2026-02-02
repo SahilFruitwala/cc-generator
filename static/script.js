@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const downloadLink = document.getElementById('download-link');
     const captionPreviewContainer = document.getElementById('caption-preview-container');
     const captionPreview = document.getElementById('caption-preview');
+    const downloadLastBtn = document.getElementById('download-last-btn');
 
     // Progress Modal Elements
     const progressModal = document.getElementById('progress-modal-overlay');
@@ -235,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         terminal.innerHTML = '<div class="terminal-line">> Initializing...</div>';
         progressBar.style.width = '0%';
         progressBar.style.background = 'var(--primary)';
+        downloadLastBtn.style.display = 'none'; // Hide previous result
 
         try {
             const response = await fetch('/transcribe', { method: 'POST', body: formData });
@@ -302,8 +304,14 @@ document.addEventListener('DOMContentLoaded', () => {
         progressCloseBtn.hidden = false;
         cancelBtn.hidden = true;
         
+        // Modal download link
         downloadLink.href = `/uploads/${filename}`;
         downloadLink.download = filename;
+        
+        // Main UI persistent download link
+        downloadLastBtn.href = `/uploads/${filename}`;
+        downloadLastBtn.download = filename;
+        downloadLastBtn.style.display = 'inline-flex';
         
         progressTitle.textContent = 'Conversion Complete!';
     }

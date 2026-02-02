@@ -69,10 +69,15 @@
                         Auto-download missing models
                     </label>
                     <input type="hidden" id="model-select" value="mlx-community/whisper-large-v3-turbo">
-                    <button id="generate-btn" class="btn btn-primary btn-large">
-                        <span>Generate Captions</span>
-                        <div class="loader" id="btn-loader" hidden></div>
-                    </button>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <a id="download-last-btn" href="#" class="btn btn-success btn-large" style="display: none; padding: 1.25rem 2rem;" download>
+                            Download Last SRT
+                        </a>
+                        <button id="generate-btn" class="btn btn-primary btn-large">
+                            <span>Generate Captions</span>
+                            <div class="loader" id="btn-loader" hidden></div>
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -138,6 +143,6 @@
         </div>
     </div>
 
-    <script src="/static/script.js?v=1.8"></script>
+    <script src="/static/script.js?v=1.9"></script>
 </body>
 </html>

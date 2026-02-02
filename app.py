@@ -295,7 +295,25 @@ os.makedirs("static", exist_ok=True)
 os.makedirs("uploads", exist_ok=True)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.get("/uploads/{filename}")
+async def download_file(filename: str, background_tasks: BackgroundTasks):
+    file_path = os.path.join("uploads", filename)
+    if not os.path.exists(file_path):
+        return JSONResponse({"error": "File not found"}, status_code=404)
+    
+    def cleanup():
+        try:
+            print(f"DEBUG: Auto-deleting SRT file: {filename}")
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            print(f"ERROR: Failed to delete SRT: {e}")
+
+    # Use BackgroundTasks to queue the cleanup after the response is sent
+    background_tasks.add_task(cleanup)
+    
+    return FileResponse(file_path, filename=filename, media_type="application/x-subrip")
 
 @app.get("/")
 async def read_index():
